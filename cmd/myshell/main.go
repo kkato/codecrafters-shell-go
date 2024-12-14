@@ -7,7 +7,6 @@ import (
 )
 
 func main() {
-	// Uncomment this block to pass the first stage
 	for {
 		fmt.Fprint(os.Stdout, "$ ")
 
@@ -15,6 +14,10 @@ func main() {
 		if err != nil {
 			fmt.Fprintln(os.Stderr, "Error reading input:", err)
 			return
+		}
+
+		if command == "exit 0\n" {
+			os.Exit(0)
 		}
 		fmt.Println(command[:len(command)-1] + ": command not found")
 	}
