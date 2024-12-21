@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -33,11 +34,36 @@ func main() {
 				case "echo", "exit", "type":
 					fmt.Printf("%s is a shell builtin\n", args[1])
 				default:
-					fmt.Printf("%s: not found\n", args[1])
+					path, found := findExecutable(args[1])
+					if found {
+						fmt.Println(path)
+					} else {
+						fmt.Printf("%s: not found\n", args[1])
+					}
 				}
 			}
 		default:
 			fmt.Println(command + ": command not found")
 		}
 	}
+}
+
+func findExecutable(command string) (string, bool) {
+	pathEnv := os.Getenv("PATH")
+	if pathEnv == "" {
+		return "", false
+	}
+
+	paths := strings.Split(pathEnv, string(os.PathListSeparator))
+
+	for _, dir := range paths {
+		fullPath := filepath.Join(dir, command)
+		if fileInfo, err := os.Stat(fullPath); err == nil {
+			if !fileInfo.IsDir() && (fileInfo.Mode()&0111 != 0) {
+				return fullPath, true
+			}
+		}
+	}
+
+	return "", false
 }
