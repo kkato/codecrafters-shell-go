@@ -43,6 +43,13 @@ func main() {
 					}
 				}
 			}
+		case "pwd":
+			dir, err := os.Getwd()
+			if err != nil {
+				fmt.Fprintln(os.Stderr, "Error getting working directory:", err)
+			} else {
+				fmt.Println(dir)
+			}
 		default:
 			path, found := findExecutable(args[0])
 			if found {
